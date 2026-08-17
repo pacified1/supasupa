@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>MoonChat 🌙</title>
+
+  <style>
+    :root {
+      --bg: #0d0b14;
+      --card: #161321;
+      --card2: #1e192c;
+      --text: #f8f3ff;
+      --muted: #9d95ad;
+      --purple: #a78bfa;
+      --pink: #ff79c6;
+      --border: rgba(255,255,255,.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(167,139,250,.14),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 85% 90%,
+          rgba(255,121,198,.10),
+          transparent 30%
+        ),
+        var(--bg);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      height: min(850px, calc(100vh - 40px));
+
+      display: flex;
+      flex-direction: column;
+
+      overflow: hidden;
+
+      background: rgba(22,19,33,.94);
+
+      border: 1px solid var(--border);
+      border-radius: 28px;
+
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.5);
+
+      backdrop-filter: blur(20px);
+    }
+
+    header {
+      padding: 20px 23px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .moon {
+      width: 45px;
+      height: 45px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 50%;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--purple),
+          var(--pink)
+        );
+
+      box-shadow:
+        0 0 25px rgba(167,139,250,.25);
+
+      font-size: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      color: #8ef0bd;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: #72e6a8;
+
+      box-shadow:
+        0 0 10px #72e6a8;
+    }
+
+    #messages {
+      flex: 1;
+
+      overflow-y: auto;
+
+      padding: 25px;
+
+      scroll-behavior: smooth;
+    }
+
+    #messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #messages::-webkit-scrollbar-thumb {
+      background: #30283f;
+      border-radius: 20px;
+    }
+
+    .welcome {
+      text-align: center;
+      color: var(--muted);
+
+      margin-top: 100px;
+    }
+
+    .welcome-icon {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .welcome h2 {
+      color: var(--text);
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+
+    .welcome p {
+      margin: 0;
+
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 15px;
+
+      animation: appear .2s ease;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.mine {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 80%;
+
+      padding: 12px 15px;
+
+      background: var(--card2);
+
+      border: 1px solid var(--border);
+
+      border-radius:
+        18px
+        18px
+        18px
+        5px;
+    }
+
+    .message.mine .bubble {
+      background:
+        linear-gradient(
+          135deg,
+          #7354c5,
+          #9c78e8
+        );
+
+      border-radius:
+        18px
+        18px
+        5px
+        18px;
+    }
+
+    .text {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .time {
+      margin-top: 5px;
+
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+    .mine .time {
+      text-align: right;
+      color: rgba(255,255,255,.65);
+    }
+
+    .composer {
+      padding: 15px;
+
+      border-top: 1px solid var(--border);
+
+      background: rgba(10,8,15,.4);
+    }
+
+    form {
+      display: flex;
+      gap: 9px;
+    }
+
+    textarea {
+      flex: 1;
+
+      min-height: 48px;
+      max-height: 130px;
+
+      resize: none;
+
+      padding: 14px 15px;
+
+      border: 1px solid var(--border);
+      border-radius: 17px;
+
+      outline: none;
+
+      background: #12101b;
+      color: var(--text);
+
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    textarea:focus {
+      border-color: rgba(167,139,250,.6);
+
+      box-shadow:
+        0 0 0 3px rgba(167,139,250,.08);
+    }
+
+    textarea::placeholder {
+      color: #6e687b;
+    }
+
+    .send {
+      height: 48px;
+
+      padding: 0 19px;
+
+      border: none;
+      border-radius: 16px;
+
+      cursor: pointer;
+
+      color: white;
+
+      font-weight: 700;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7656c9,
+          #ff79c6
+        );
+
+      transition: .2s;
+    }
+
+    .send:hover {
+      transform: translateY(-2px);
+    }
+
+    .send:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+
+      padding: 7px 4px 0;
+
+      color: #686273;
+      font-size: 10px;
+    }
+
+    .error {
+      color: #ff7f9d;
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0;
+      }
+
+      .app {
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+      }
+
+      header {
+        padding: 17px;
+      }
+
+      #messages {
+        padding: 18px;
+      }
+
+      .composer {
+        padding: 12px;
+      }
+
+      .bubble {
+        max-width: 88%;
+      }
+
+      .send {
+        padding: 0 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+
+    <div class="brand">
+
+      <div class="moon">
+        🌙
+      </div>
+
+      <div>
+        <h1>MoonChat</h1>
+
+        <div class="subtitle">
+          a tiny corner of the internet ✨
+        </div>
+      </div>
+
+    </div>
+
+    <div class="status">
+      <span class="status-dot"></span>
+      <span id="statusText">connecting...</span>
+    </div>
+
+  </header>
+
+
+  <main id="messages">
+
+    <div class="welcome" id="welcome">
+
+      <div class="welcome-icon">
+        💜
+      </div>
+
+      <h2>Welcome to MoonChat</h2>
+
+      <p>
+        Say something to everyone.<br>
+        Be kind, stay anonymous ✨
+      </p>
+
+    </div>
+
+  </main>
+
+
+  <div class="composer">
+
+    <form id="chatForm">
+
+      <textarea
+        id="messageInput"
+        maxlength="500"
+        rows="1"
+        placeholder="type something..."
+        autocomplete="off"
+      ></textarea>
+
+      <button
+        class="send"
+        id="sendButton"
+        type="submit"
+      >
+        Send ✨
+      </button>
+
+    </form>
+
+    <div class="bottom">
+      <span>500 characters max</span>
+      <span>public chat · anonymous</span>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Your configuration -->
+<script src="config.js"></script>
+
+
+<script>
+
+  /*
+    ========================================
+    SUPABASE
+    ========================================
+  */
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+  /*
+    ========================================
+    ELEMENTS
+    ========================================
+  */
+
+  const messagesEl =
+    document.getElementById("messages");
+
+  const welcomeEl =
+    document.getElementById("welcome");
+
+  const form =
+    document.getElementById("chatForm");
+
+  const input =
+    document.getElementById("messageInput");
+
+  const sendButton =
+    document.getElementById("sendButton");
+
+  const statusText =
+    document.getElementById("statusText");
+
+
+  /*
+    ========================================
+    LOCAL USER ID
+    ========================================
+
+    This lets us identify which messages
+    were sent by this browser.
+
+    It is NOT a real identity.
+  */
+
+  let clientId =
+    localStorage.getItem("moonchat_client_id");
+
+  if (!clientId) {
+
+    clientId =
+      crypto.randomUUID();
+
+    localStorage.setItem(
+      "moonchat_client_id",
+      clientId
+    );
+  }
+
+
+  /*
+    ========================================
+    FORMAT TIME
+    ========================================
+  */
+
+  function formatTime(timestamp) {
+
+    const date =
+      new Date(timestamp);
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+
+  /*
+    ========================================
+    ADD MESSAGE TO SCREEN
+    ========================================
+  */
+
+  function addMessage(message) {
+
+    const wrapper =
+      document.createElement("div");
+
+    wrapper.className =
+      "message";
+
+    if (message.client_id === clientId) {
+      wrapper.classList.add("mine");
+    }
+
+
+    const bubble =
+      document.createElement("div");
+
+    bubble.className =
+      "bubble";
+
+
+    const text =
+      document.createElement("div");
+
+    text.className =
+      "text";
+
+    /*
+      IMPORTANT:
+
+      textContent is used instead of innerHTML
+      so somebody cannot send <script>...</script>
+      and execute JavaScript.
+    */
+
+    text.textContent =
+      message.body;
+
+
+    const time =
+      document.createElement("div");
+
+    time.className =
+      "time";
+
+    time.textContent =
+      formatTime(message.created_at);
+
+
+    bubble.appendChild(text);
+    bubble.appendChild(time);
+
+    wrapper.appendChild(bubble);
+
+    messagesEl.appendChild(wrapper);
+
+    messagesEl.scrollTop =
+      messagesEl.scrollHeight;
+  }
+
+
+  /*
+    ========================================
+    LOAD EXISTING MESSAGES
+    ========================================
+  */
+
+  async function loadMessages() {
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+
+      .from("messages")
+
+      .select(
+        "id, body, client_id, created_at"
+      )
+
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      )
+
+      .limit(100);
+
+
+    if (error) {
+
+      console.error(error);
+
+      statusText.textContent =
+        "database error";
+
+      return;
+    }
+
+
+    welcomeEl.style.display =
+      data.length ? "none" : "block";
+
+
+    data.forEach(addMessage);
+  }
+
+
+  /*
+    ========================================
+    SEND MESSAGE
+    ========================================
+  */
+
+  form.addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+      const body =
+        input.value.trim();
+
+
+      if (!body) {
+        return;
+      }
+
+
+      if (body.length > 500) {
+        return;
+      }
+
+
+      sendButton.disabled = true;
+
+
+      const {
+        error
+      } = await supabaseClient
+
+        .from("messages")
+
+        .insert({
+
+          body: body,
+
+          client_id: clientId
+
+        });
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "Couldn't send the message. Please try again."
+        );
+
+        sendButton.disabled = false;
+
+        return;
+      }
+
+
+      input.value = "";
+
+      input.style.height = "48px";
+
+      sendButton.disabled = false;
+
+      input.focus();
+
+    }
+  );
+
+
+  /*
+    ========================================
+    ENTER TO SEND
+    ========================================
+  */
+
+  input.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+
+        event.preventDefault();
+
+        form.requestSubmit();
+      }
+
+    }
+  );
+
+
+  /*
+    ========================================
+    AUTO-RESIZE TEXTAREA
+    ========================================
+  */
+
+  input.addEventListener(
+    "input",
+    function() {
+
+      this.style.height = "48px";
+
+      this.style.height =
+        Math.min(
+          this.scrollHeight,
+          130
+        ) + "px";
+
+    }
+  );
+
+
+  /*
+    ========================================
+    REALTIME
+    ========================================
+  */
+
+  supabaseClient
+
+    .channel("moonchat-messages")
+
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "messages"
+      },
+
+      function(payload) {
+
+        addMessage(payload.new);
+
+        welcomeEl.style.display = "none";
+
+      }
+    )
+
+    .subscribe(function(status) {
+
+      console.log(
+        "Realtime status:",
+        status
+      );
+
+
+      if (status === "SUBSCRIBED") {
+
+        statusText.textContent =
+          "live";
+
+      } else {
+
+        statusText.textContent =
+          "connecting...";
+
+      }
+
+    });
+
+
+  /*
+    ========================================
+    START
+    ========================================
+  */
+
+  loadMessages();
+
+</script>
+
+</body>
+</html>
